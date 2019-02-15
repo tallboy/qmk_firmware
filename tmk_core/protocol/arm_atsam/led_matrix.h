@@ -83,16 +83,11 @@ typedef struct led_disp_s {
     float bottom;
     float width;
     float height;
+    float max_distance;
 } led_disp_t;
 
 uint8_t led_matrix_init(void);
 void rgb_matrix_init_user(void);
-
-#define LED_MODE_NORMAL             0   //Must be 0
-#define LED_MODE_KEYS_ONLY          1
-#define LED_MODE_NON_KEYS_ONLY      2
-#define LED_MODE_INDICATORS_ONLY    3
-#define LED_MODE_MAX_INDEX          LED_MODE_INDICATORS_ONLY   //Must be highest value
 
 #define EF_NONE         0x00000000  //No effect
 #define EF_OVER         0x00000001  //Overwrite any previous color information with new
@@ -120,6 +115,7 @@ typedef struct led_setup_s {
 #define LED_FLAG_USE_RGB             0x10
 #define LED_FLAG_USE_PATTERN         0x20
 #define LED_FLAG_USE_ROTATE_PATTERN  0x40
+#define LED_FLAG_USE_GLITTER         0X80
 
 typedef struct led_instruction_s {
     uint16_t flags; // Bitfield for LED instructions
@@ -145,16 +141,24 @@ extern uint8_t gcr_actual_last;
 extern uint8_t led_animation_id;
 extern uint8_t led_enabled;
 extern float led_animation_speed;
-extern uint8_t led_lighting_mode;
 extern uint8_t led_animation_direction;
 extern uint8_t led_animation_orientation;
 extern uint8_t led_animation_breathing;
 extern uint8_t led_animation_breathe_cur;
-extern uint8_t breathe_dir;
+extern int8_t breathe_dir;
+extern uint8_t breathe_step;
+extern uint8_t led_animation_glittering;
+extern int16_t led_animation_glitter_cur[];
+extern int8_t glitter_dir[];
+extern uint8_t glitter_step;
+extern uint8_t glitter_smooth;
 extern const uint8_t led_setups_count;
+extern uint8_t led_animation_circular;
+extern uint8_t led_game_colors;
 
 extern void *led_setups[];
 extern led_instruction_t led_instructions[];
+extern led_instruction_t led_game_instructions[];
 
 extern uint32_t layer_state;
 

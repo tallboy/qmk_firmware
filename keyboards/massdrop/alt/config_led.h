@@ -43,6 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define ANIMATION_SPEED_STEP        1
 
+
 #define BREATHE_MIN_STEP            0
 #define BREATHE_MAX_STEP            255
 

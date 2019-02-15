@@ -1,5 +1,9 @@
 # Quantum Mechanical Keyboard Firmware
 
+##This is a fork of the massdrop fork of qmk
+This fork has specific modifications for the Massdrop ALT. 
+Added glitter/cloud effect, customized my personal keymap, and added funcitonality for a 'game mode' led map. The 'game mode' for leds keeps the key layout the same but can change RGB layouts with a keycode.
+
 [![Current Version](https://img.shields.io/github/tag/qmk/qmk_firmware.svg)](https://github.com/qmk/qmk_firmware/tags)
 [![Build Status](https://travis-ci.org/qmk/qmk_firmware.svg?branch=master)](https://travis-ci.org/qmk/qmk_firmware)
 [![Discord](https://img.shields.io/discord/440868230475677696.svg)](https://discord.gg/Uq7gcHh)
@@ -17,12 +21,7 @@ The docs are hosted on [Gitbook](https://www.gitbook.com/book/qmk/firmware/detai
 
 ## Supported Keyboards
 
-* [Planck](/keyboards/planck/)
-* [Preonic](/keyboards/preonic/)
-* [ErgoDox EZ](/keyboards/ergodox_ez/)
-* [Clueboard](/keyboards/clueboard/)
-* [Cluepad](/keyboards/clueboard/17/)
-* [Atreus](/keyboards/atreus/)
+* [ALT](/keyboards/massdrop/alt/)
 
 The project also includes community support for [lots of other keyboards](/keyboards/).
 

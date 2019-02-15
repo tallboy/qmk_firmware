@@ -1,6 +1,6 @@
 # Quantum Mechanical Keyboard Firmware
 
-##This is a fork of the massdrop fork of qmk
+## This is a fork of the massdrop fork of qmk
 This fork has specific modifications for the Massdrop ALT. 
 Added glitter/cloud effect, customized my personal keymap, and added funcitonality for a 'game mode' led map. The 'game mode' for leds keeps the key layout the same but can change RGB layouts with a keycode.
 
@@ -11,7 +11,7 @@ Added glitter/cloud effect, customized my personal keymap, and added funcitonali
 [![GitHub contributors](https://img.shields.io/github/contributors/qmk/qmk_firmware.svg)](https://github.com/qmk/qmk_firmware/pulse/monthly)
 [![GitHub forks](https://img.shields.io/github/forks/qmk/qmk_firmware.svg?style=social&label=Fork)](https://github.com/qmk/qmk_firmware/)
 
-This is a keyboard firmware based on the [tmk\_keyboard firmware](http://github.com/tmk/tmk_keyboard) with some useful features for Atmel AVR and ARM controllers, and more specifically, the [OLKB product line](https://olkb.com), the [ErgoDox EZ](http://www.ergodox-ez.com) keyboard, and the [Clueboard product line](http://clueboard.co/).
+This is a keyboard firmware based on the [tmk\_keyboard firmware](http://github.com/tmk/tmk_keyboard) with some useful features for Atmel AVR and ARM controllers, and more specifically, the [Massdrop ALT](https://www.massdrop.com/buy/massdrop-alt-mechanical-keyboard).
 
 ## Documentation
 

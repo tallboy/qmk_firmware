@@ -348,8 +348,8 @@ led_instruction_t led_game_instructions_pgb[] = {   //purple
 };
 
 led_instruction_t led_instructions_default[] = {
-    {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_ROTATE_PATTERN,                        .layer = 0, .id0 = 32767}, //esc-del top row pattern with no glitter
-    {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_ROTATE_PATTERN | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 4294934528, .id1 = 4294967295, .id2 = 4294967295, .id3 = 511}, //esc-del top row pattern with no glitter
+    {.flags = LED_FLAG_MATCH_ID | LED_FLAG_USE_ROTATE_PATTERN,                         .id0 = 32767}, //esc-del top row pattern with no glitter
+    {.flags = LED_FLAG_MATCH_ID | LED_FLAG_USE_ROTATE_PATTERN | LED_FLAG_USE_GLITTER,  .id0 = 4294934528, .id1 = 4294967295, .id2 = 4294967295, .id3 = 511}, //esc-del top row pattern with no glitter
     { .end = 1 }
 };
 

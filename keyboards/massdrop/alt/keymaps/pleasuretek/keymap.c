@@ -3,22 +3,15 @@
 enum alt_keycodes {
     L_BRI = SAFE_RANGE, //LED Brightness Increase
     L_BRD,              //LED Brightness Decrease
-    L_I_N,              //LED instruction preset Next
-    L_I_P,              //LED instruciton preset Previous
     L_PTN,              //LED Pattern Select Next
     L_PTP,              //LED Pattern Select Previous
     L_PSI,              //LED Pattern Speed Increase
     L_PSD,              //LED Pattern Speed Decrease
-    L_ORI,              //LED Pattern orientation
-    L_GLITI,            //LED Breath Speed Increase
-    L_GLITD,            //LED Breath Speed Decrease
-    L_GLITSM,           //LED Glitter smooth (glitter vs clouds)
+    L_T_MD,             //LED Toggle Mode
     L_T_ONF,            //LED Toggle On / Off
     L_ON,               //LED On
     L_OFF,              //LED Off
-    L_T_GCM,            //LED Toggle Game Color Mode
     L_T_BR,             //LED Toggle Breath Effect
-    L_T_GLIT,           //LED Toggle Glitter Effect
     L_T_PTD,            //LED Toggle Scrolling Pattern Direction
     U_T_AUTO,           //USB Extra Port Toggle Auto Detect / Always Active
     U_T_AGCR,           //USB Toggle Automatic GCR control
@@ -27,6 +20,15 @@ enum alt_keycodes {
     DBG_KBD,            //DEBUG Toggle Keyboard Prints
     DBG_MOU,            //DEBUG Toggle Mouse Prints
     MD_BOOT,            //Restart into bootloader after hold timeout
+    L_I_N,              //LED instruction preset Next
+    L_I_P,              //LED instruciton preset Previous
+    L_ORI,              //LED Pattern orientation
+    L_CIR,              //LED Pattern circular or linear
+    L_GLITI,            //LED Breath Speed Increase
+    L_GLITD,            //LED Breath Speed Decrease
+    L_GLITSM,           //LED Glitter smooth (glitter vs clouds)
+    L_T_GCM,            //LED Toggle Game Color Mode
+    L_T_GLIT,           //LED Toggle Glitter Effect
 };
 
 #define TG_NKRO MAGIC_TOGGLE_NKRO //Toggle 6KRO / NKRO mode
@@ -44,7 +46,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [1] = LAYOUT(
         KC_GRV,   KC_F1,   KC_F2,   KC_F3,   KC_F4,    KC_F5,    KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_TRNS, KC_MUTE, \
         L_T_BR,   L_PSD,   L_BRI,   L_PSI,   KC_TRNS,  KC_TRNS,  KC_TRNS, U_T_AUTO,U_T_AGCR,KC_TRNS, KC_PSCR, KC_SLCK, KC_PAUS, KC_TRNS, KC_END, \
-        L_T_GLIT, L_PTP,   L_BRD,   L_PTN,   KC_TRNS,  KC_TRNS,  KC_TRNS, L_I_P,   L_I_N,   KC_MYCM, KC_CALC, KC_TRNS,          L_T_GCM, KC_VOLU, \
+        L_T_GLIT, L_PTP,   L_BRD,   L_PTN,   L_CIR,    L_ORI,    KC_TRNS, L_I_P,   L_I_N,   KC_MYCM, KC_CALC, KC_TRNS,          L_T_GCM, KC_VOLU, \
         L_GLITSM, L_GLITD, L_T_ONF, L_GLITI, KC_TRNS,  MD_BOOT,  TG_NKRO, KC_TRNS, KC_MPRV, KC_MNXT, KC_MPLY, KC_F18,           KC_F16,  KC_VOLD, \
         KC_TRNS,  KC_TRNS, KC_TRNS,                              KC_MPLY,                            KC_TRNS, KC_TRNS, KC_F13,  KC_F14,  KC_F15  \
     ),
@@ -93,37 +95,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (led_animation_breathing) gcr_breathe = gcr_desired;
             }
             return false;
-        case L_ORI:
-            if(record->event.pressed) {
-              led_animation_orientation = !led_animation_orientation;
-            }
-            return false;
-        case L_T_GCM:
-            if (record->event.pressed) {
-              led_game_colors = !led_game_colors;
-            }
-            return false;
-        case L_GLITSM:
-            if (record->event.pressed) {
-              glitter_smooth = !glitter_smooth;
-            }
-            return false;
-        case L_GLITI:
-            if (record->event.pressed) {
-                if(glitter_step < 16) {
-                  glitter_step++;
-                }
-            }
-            return false;
-        case L_GLITD:
-            if (record->event.pressed) {
-                if(glitter_step > 1) {
-                  glitter_step--;
-                } else {
-                  glitter_step = 1;
-                }
-            }
-            return false;
         case L_PTN:
             if (record->event.pressed) {
                 if (led_animation_id == led_setups_count - 1) led_animation_id = 0;
@@ -136,18 +107,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 else led_animation_id--;
             }
             return false;
-        case L_I_N:
-            if (record->event.pressed) {
-                (led_instruction_id == led_instruction_count - 1) ? led_instruction_id = 0 : led_instruction_id++;
-                set_led_animation_id(led_default_rotate_pattern[led_instruction_id]);
-            }
-            return false;
-        case L_I_P:
-            if (record->event.pressed) {
-                (led_instruction_id == 0) ? led_instruction_id = led_instruction_count - 1 : led_instruction_id--;
-                set_led_animation_id(led_default_rotate_pattern[led_instruction_id]);
-            }
-            return false;
         case L_PSI:
             if (record->event.pressed) {
                 led_animation_speed += ANIMATION_SPEED_STEP;
@@ -157,6 +116,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 led_animation_speed -= ANIMATION_SPEED_STEP;
                 if (led_animation_speed < 0) led_animation_speed = 0;
+            }
+            return false;
+        case L_T_MD:
+            if (record->event.pressed) {
+                led_lighting_mode++;
+                if (led_lighting_mode > LED_MODE_MAX_INDEX) led_lighting_mode = LED_MODE_NORMAL;
             }
             return false;
         case L_T_ONF:
@@ -184,20 +149,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                     gcr_breathe = gcr_desired;
                     led_animation_breathe_cur = BREATHE_MIN_STEP;
                     breathe_dir = 1;
-                }
-            }
-            return false;
-        case L_T_GLIT:
-            if (record->event.pressed) {
-                led_animation_glittering = !led_animation_glittering;
-                if (led_animation_glittering) {
-                  uint8_t i;
-                  for(i = 0; i < ISSI3733_LED_COUNT; i++) {
-                    uint8_t rn = rand() % 255;
-                    led_animation_glitter_cur[i] = rn;
-                    if(i % 2) glitter_dir[i] = 1;
-                    else glitter_dir[i] = -1;
-                  }
                 }
             }
             return false;
@@ -243,6 +194,69 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (timer_elapsed32(key_timer) >= 500) {
                     reset_keyboard();
                 }
+            }
+            return false;
+        //custom pleasuretek keycodes
+        case L_I_N:
+            if (record->event.pressed) {
+                (led_instruction_id == led_instruction_count - 1) ? led_instruction_id = 0 : led_instruction_id++;
+                set_led_animation_id(led_default_rotate_pattern[led_instruction_id]);
+            }
+            return false;
+        case L_I_P:
+            if (record->event.pressed) {
+                (led_instruction_id == 0) ? led_instruction_id = led_instruction_count - 1 : led_instruction_id--;
+                set_led_animation_id(led_default_rotate_pattern[led_instruction_id]);
+            }
+            return false;
+        case L_ORI:
+            if(record->event.pressed) {
+              led_animation_orientation = !led_animation_orientation;
+            }
+            return false;
+        case L_CIR:
+            if(record->event.pressed) {
+              led_animation_circular = !led_animation_circular;
+            }
+            return false;
+        case L_GLITI:
+            if (record->event.pressed) {
+                if(glitter_step < 16) {
+                  glitter_step++;
+                }
+            }
+            return false;
+        case L_GLITD:
+            if (record->event.pressed) {
+                if(glitter_step > 1) {
+                  glitter_step--;
+                } else {
+                  glitter_step = 1;
+                }
+            }
+            return false;
+        case L_GLITSM:
+            if (record->event.pressed) {
+              glitter_smooth = !glitter_smooth;
+            }
+            return false;
+        case L_T_GLIT:
+            if (record->event.pressed) {
+                led_animation_glittering = !led_animation_glittering;
+                if (led_animation_glittering) {
+                  uint8_t i;
+                  for(i = 0; i < ISSI3733_LED_COUNT; i++) {
+                    uint8_t rn = rand() % 255;
+                    led_animation_glitter_cur[i] = rn;
+                    if(i % 2) glitter_dir[i] = 1;
+                    else glitter_dir[i] = -1;
+                  }
+                }
+            }
+            return false;
+        case L_T_GCM:
+            if (record->event.pressed) {
+              led_game_colors = !led_game_colors;
             }
             return false;
         default:
@@ -308,7 +322,7 @@ led_instruction_t led_instructions_pgb[] = {   //purple, green, and black rainbo
     {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB,                                   .layer = 1, .id1 = 33554433,                      .r = 52,  .g = 83,  .b = 83},  //dark white/grey
     {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB,                                   .layer = 1, .id1 = 16778496, .id2 = 5,            .r = 255, .g = 20,  .b = 147},  //pink
     {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_PATTERN | LED_FLAG_USE_GLITTER,        .layer = 1, .id0 = 2113445888, .id1 = 4258133628, .id2 = 7, .pattern_id = 11}, //null off
-    {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_PATTERN,                               .layer = 1, .id0 = 2147491838, .id1 = 2, .id2 = 4294967288, .id3 = 511, .pattern_id = 1},
+    {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_PATTERN,                               .layer = 1, .id0 = 2147491838, .id1 = 2, .id2 = 4294967288, .id3 = 511, .pattern_id = 2},
     { .end = 1 }
 };
 
@@ -329,11 +343,13 @@ led_instruction_t led_game_instructions_pgb[] = {   //purple
     {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB,                                   .layer = 1, .id1 = 33554433,                      .r = 52,  .g = 83,  .b = 83},  //dark white/grey
     {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB,                                   .layer = 1, .id1 = 16778496, .id2 = 5,            .r = 255, .g = 20,  .b = 147},  //pink
     {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_PATTERN | LED_FLAG_USE_GLITTER,        .layer = 1, .id0 = 2113445888, .id1 = 4258133628, .id2 = 7, .pattern_id = 11}, //null off
-    {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_PATTERN,                               .layer = 1, .id0 = 2147491838, .id1 = 2, .id2 = 4294967288, .id3 = 511, .pattern_id = 1},
+    {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_PATTERN,                               .layer = 1, .id0 = 2147491838, .id1 = 2, .id2 = 4294967288, .id3 = 511, .pattern_id = 2},
     { .end = 1 }
 };
 
 led_instruction_t led_instructions_default[] = {
+    {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_ROTATE_PATTERN,                        .layer = 0, .id0 = 32767}, //esc-del top row pattern with no glitter
+    {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_ROTATE_PATTERN | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 4294934528, .id1 = 4294967295, .id2 = 4294967295, .id3 = 511}, //esc-del top row pattern with no glitter
     { .end = 1 }
 };
 
@@ -351,7 +367,7 @@ void *led_game_instruction_list[] = {
 
 const uint8_t led_instruction_count = sizeof(led_instruction_list) / sizeof(led_instruction_list[0]);
 
-uint8_t led_default_rotate_pattern[3] = {
+uint8_t led_default_rotate_pattern[3] = {  //each instruction group in led_instruction_list can have a default rotate pattern to set on change
     0,
     1,
     2

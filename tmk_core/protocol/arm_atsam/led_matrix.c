@@ -220,6 +220,7 @@ void disp_calc_extents(void)
 
     disp.width = disp.right - disp.left;
     disp.height = disp.top - disp.bottom;
+    disp.max_distance = sqrtf(powf(disp.width, 2) + powf(disp.height, 2));
 }
 
 void disp_pixel_setup(void)
@@ -269,10 +270,6 @@ issi3733_led_t *led_cur;
 uint8_t led_per_run = 15;
 float breathe_mult;
 float pomod;
-
-void set_led_animation_id(uint8_t id) {
-    led_animation_id = id;
-}
 
 void led_run_pattern(led_setup_t *f, float* ro, float* go, float* bo, float pos) {
     float po;
@@ -328,9 +325,58 @@ void led_run_pattern(led_setup_t *f, float* ro, float* go, float* bo, float pos)
     }
 }
 
+void set_led_animation_id(uint8_t id) {
+    led_animation_id = id;
+}
+
+void led_run_glitter(float* ro, float* go, float* bo) {
+    double glitter_mult;
+    if (led_animation_glittering)
+    {
+        uint8_t led_id = led_cur->id - 1;
+        led_animation_glitter_cur[led_id] += glitter_step * glitter_dir[led_id];
+        if(glitter_smooth) {
+            if (led_animation_glitter_cur[led_id] >= BREATHE_MAX_STEP)
+            {
+                glitter_dir[led_id] = -1;
+                led_animation_glitter_cur[led_id] = BREATHE_MAX_STEP;
+            }
+            else if (led_animation_glitter_cur[led_id] <= BREATHE_MIN_STEP)
+            {
+                glitter_dir[led_id] = 1;
+                led_animation_glitter_cur[led_id] = BREATHE_MIN_STEP;
+            }
+        }
+        else {
+            if (led_animation_glitter_cur[led_id] >= BREATHE_MAX_STEP)
+            {
+                uint8_t randy = rand() % 255;
+                randy -= 1;
+                if (randy > 127)  glitter_dir[led_id] = -1;
+                else led_animation_glitter_cur[led_id] = BREATHE_MIN_STEP;
+            }
+            else if (led_animation_glitter_cur[led_id] <= BREATHE_MIN_STEP)
+            {
+                uint8_t randy = rand() % 255;
+                randy -= 1;
+                if (randy > 127) glitter_dir[led_id] = 1;
+                else led_animation_glitter_cur[led_id] = BREATHE_MAX_STEP;
+            }
+        }
+        //Brightness curve created for 256 steps, 0 - ~98%
+        glitter_mult = 0.000015 * led_animation_glitter_cur[led_id] * led_animation_glitter_cur[led_id];
+        glitter_mult += 0.024625;              //add a small amount to get max to 1.0
+        if (glitter_mult > 1.0) glitter_mult = 1.0;
+        else if (glitter_mult < 0.0) glitter_mult = 0.0;
+
+        *ro *= glitter_mult;
+        *go *= glitter_mult;
+        *bo *= glitter_mult;
+    }
+}
+
 __attribute__((weak))
 led_instruction_t led_instructions_default[] = { { .end = 1 } };
-
 __attribute__((weak))
 void *led_instruction_list[] = {led_instructions_default};
 __attribute__((weak))
@@ -396,12 +442,12 @@ void led_matrix_run(void)
         bo = 0;
 
         if (led_animation_circular) {
-            po = sqrtf((powf(fabsf((disp.width / 2) - (led_cur->x - disp.left)), 2) + powf(fabsf((disp.height / 2) - (led_cur->y - disp.bottom)), 2))) / disp.max_distance * 100;
+            po = sqrtf((powf(fabsf((disp.width / 2) - (led_cur->x - disp.left)), 2) + powf(fabsf((disp.height / 2) - (led_cur->y - disp.bottom)), 2))) / disp.max_distance * 100;  //14x12 max_distance * 100 is 1843.9
         }
         else {
             if (led_animation_orientation)
             {
-                po = led_cur->py;
+                po = led_cur->px + led_cur->py;
             }
             else
             {
@@ -436,6 +482,7 @@ void led_matrix_run(void)
             if (led_cur_instruction->end) {
                 // If no instructions, use normal pattern
                 led_run_pattern(f, &ro, &go, &bo, po);
+                led_run_glitter(&ro, &go, &bo);
             } else {
                 uint8_t skip;
                 uint8_t modid = (led_cur->id - 1) / 32;                         //PS: Calculate which id# contains the led bit
@@ -472,56 +519,7 @@ void led_matrix_run(void)
 
                         //apply glitter clouds effect
                         if(led_cur_instruction->flags & LED_FLAG_USE_GLITTER) {
-                          double glitter_mult;
-                          if (led_animation_glittering)
-                          {
-                              uint8_t led_id = led_cur->id - 1;
-                              led_animation_glitter_cur[led_id] += glitter_step * glitter_dir[led_id];
-                              if(glitter_smooth) {
-                                  if (led_animation_glitter_cur[led_id] >= BREATHE_MAX_STEP)
-                                  {
-                                      glitter_dir[led_id] = -1;
-                                      led_animation_glitter_cur[led_id] = BREATHE_MAX_STEP;
-                                  }
-                                  else if (led_animation_glitter_cur[led_id] <= BREATHE_MIN_STEP)
-                                  {
-                                      glitter_dir[led_id] = 1;
-                                      led_animation_glitter_cur[led_id] = BREATHE_MIN_STEP;
-                                  }
-                              }
-                              else {
-                                  if (led_animation_glitter_cur[led_id] >= BREATHE_MAX_STEP)
-                                  {
-                                      uint8_t randy = rand() % 255;
-                                      randy -= 1;
-                                      if (randy > 127)  glitter_dir[led_id] = -1;
-                                      else led_animation_glitter_cur[led_id] = BREATHE_MIN_STEP;
-                                  }
-                                  else if (led_animation_glitter_cur[led_id] <= BREATHE_MIN_STEP)
-                                  {
-                                      uint8_t randy = rand() % 255;
-                                      randy -= 1;
-                                      if (randy > 127) glitter_dir[led_id] = 1;
-                                      else led_animation_glitter_cur[led_id] = BREATHE_MAX_STEP;
-                                  }
-                              }
-                              //Brightness curve created for 256 steps, 0 - ~98%
-                              glitter_mult = 0.000015 * led_animation_glitter_cur[led_id] * led_animation_glitter_cur[led_id];
-                              glitter_mult += 0.024625;              //add a small amount to get max to 1.0
-                              if (glitter_mult > 1.0) glitter_mult = 1.0;
-                              else if (glitter_mult < 0.0) glitter_mult = 0.0;
-
-                              ro *= glitter_mult;
-                              go *= glitter_mult;
-                              bo *= glitter_mult;
-                          }
-                          else
-                          {
-                            glitter_mult = 1.0;
-                            ro *= glitter_mult;
-                            go *= glitter_mult;
-                            bo *= glitter_mult;
-                          }
+                          led_run_glitter(&ro, &go, &bo);
                         }
                     }
 

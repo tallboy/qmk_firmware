@@ -1,5 +1,8 @@
 #include QMK_KEYBOARD_H
 
+
+//notes:: LSHIFT and RSHIFT are defined in my keymap as space cadet shift
+
 enum alt_keycodes {
     L_BRI = SAFE_RANGE, //LED Brightness Increase
     L_BRD,              //LED Brightness Decrease
@@ -22,8 +25,8 @@ enum alt_keycodes {
     MD_BOOT,            //Restart into bootloader after hold timeout
     L_I_N,              //LED instruction preset Next
     L_I_P,              //LED instruciton preset Previous
-    L_ORI,              //LED Pattern orientation
-    L_CIR,              //LED Pattern circular or linear
+    L_SC_N,             //LED Pattern scroll next
+    L_SC_P,             //LED Pattern scroll next
     L_GLITI,            //LED Breath Speed Increase
     L_GLITD,            //LED Breath Speed Decrease
     L_GLITSM,           //LED Glitter smooth (glitter vs clouds)
@@ -46,9 +49,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [1] = LAYOUT(
         KC_GRV,   KC_F1,   KC_F2,   KC_F3,   KC_F4,    KC_F5,    KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  KC_TRNS, KC_MUTE, \
         L_T_BR,   L_PSD,   L_BRI,   L_PSI,   KC_TRNS,  KC_TRNS,  KC_TRNS, U_T_AUTO,U_T_AGCR,KC_TRNS, KC_PSCR, KC_SLCK, KC_PAUS, KC_TRNS, KC_END, \
-        L_T_GLIT, L_PTP,   L_BRD,   L_PTN,   L_CIR,    L_ORI,    KC_TRNS, L_I_P,   L_I_N,   KC_MYCM, KC_CALC, KC_TRNS,          L_T_GCM, KC_VOLU, \
+        L_T_GLIT, L_PTP,   L_BRD,   L_PTN,   L_SC_P,   L_T_PTD,  L_SC_N,  L_I_P,   L_I_N,   KC_MYCM, KC_CALC, KC_TRNS,          L_T_GCM, KC_VOLU, \
         L_GLITSM, L_GLITD, L_T_ONF, L_GLITI, KC_TRNS,  MD_BOOT,  TG_NKRO, KC_TRNS, KC_MPRV, KC_MNXT, KC_MPLY, KC_F18,           KC_F16,  KC_VOLD, \
-        KC_TRNS,  KC_TRNS, KC_TRNS,                              KC_MPLY,                            KC_TRNS, KC_TRNS, KC_F13,  KC_F14,  KC_F15  \
+        KC_TRNS,  KC_TRNS, KC_TRNS,                              KC_MPLY,                            KC_RCTL, KC_TRNS, KC_F13,  KC_F14,  KC_F15  \
     ),
     /*
     [X] = LAYOUT(
@@ -209,14 +212,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 set_led_animation_id(led_default_rotate_pattern[led_instruction_id]);
             }
             return false;
-        case L_ORI:
+        case L_SC_N:
             if(record->event.pressed) {
-              led_animation_orientation = !led_animation_orientation;
+              led_animation_orientation++;
+              if (led_animation_orientation > LED_SCROLL_MAX_INDEX) led_animation_orientation = LED_SCROLL_HORIZ;
             }
             return false;
-        case L_CIR:
+        case L_SC_P:
             if(record->event.pressed) {
-              led_animation_circular = !led_animation_circular;
+              if (led_animation_orientation == 0) led_animation_orientation = LED_SCROLL_MAX_INDEX;
+              led_animation_orientation--;
             }
             return false;
         case L_GLITI:
@@ -263,7 +268,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return true; //Process all other keycodes normally
     }
 }
-
 
 led_instruction_t led_instructions_pcw[] = {  //pink, cyan, and white
     {.flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER,            .layer = 0, .id0 = 335478784,  .id1 = 16770591,   .r = 255, .g = 20,  .b = 147}, //pink
@@ -347,6 +351,46 @@ led_instruction_t led_game_instructions_pgb[] = {   //purple
     { .end = 1 }
 };
 
+led_instruction_t led_instructions_gsheets[] = {
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 16385, .id1 = 16777216, .id2 = 1229530263, .id3 = 66, .r = 255, .g = 0, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB, .layer = 0, .id0 = 2147500030, .id1 = 487, .id2 = 614765128, .id3 = 297, .r = 0, .g = 255, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 1610645504, .id1 = 4269808640, .id2 = 2450671904, .id3 = 148, .r = 255, .g = 255, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 536805376, .id1 = 8380952, .id2 = 0, .id3 = 0, .r = 255, .g = 255, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 1073758209, .id1 = 16777218, .id2 = 1229530263, .id3 = 66, .r = 255, .g = 0, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 16382, .id1 = 36864, .id2 = 614765128, .id3 = 297, .r = 0, .g = 255, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 2684387328, .id1 = 4269804544, .id2 = 2450671904, .id3 = 148, .r = 255, .g = 255, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 34013184, .id1 = 7406084, .id2 = 0, .id3 = 0, .r = 255, .g = 255, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 502792192, .id1 = 786456, .id2 = 0, .id3 = 0, .r = 67, .g = 67, .b = 67 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 1, .id2 = 0, .id3 = 0, .r = 204, .g = 204, .b = 204 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 8224, .id2 = 0, .id3 = 0, .r = 255, .g = 153, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB, .layer = 1, .id0 = 0, .id1 = 64, .id2 = 0, .id3 = 0, .r = 0, .g = 255, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 128, .id2 = 0, .id3 = 0, .r = 239, .g = 239, .b = 239 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 256, .id2 = 0, .id3 = 0, .r = 243, .g = 243, .b = 243 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 16384, .id2 = 0, .id3 = 0, .r = 0, .g = 0, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 131072, .id2 = 0, .id3 = 0, .r = 255, .g = 0, .b = 0 },
+{.end = 1}
+};
+led_instruction_t led_game_instructions_gsheets[] = {
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB, .layer = 0, .id0 = 2147614721, .id1 = 3, .id2 = 1229530256, .id3 = 66, .r = 255, .g = 0, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 1073774846, .id1 = 3690992640, .id2 = 2450671904, .id3 = 148, .r = 255, .g = 255, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 1069580032, .id1 = 66063328, .id2 = 7, .id3 = 0, .r = 0, .g = 0, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 851968, .id1 = 536993804, .id2 = 614765128, .id3 = 297, .r = 0, .g = 255, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 0, .id0 = 3145728, .id1 = 917520, .id2 = 0, .id3 = 0, .r = 255, .g = 255, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 1073758209, .id1 = 16777218, .id2 = 1229530263, .id3 = 66, .r = 255, .g = 0, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 16382, .id1 = 36864, .id2 = 614765128, .id3 = 297, .r = 0, .g = 255, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 2684387328, .id1 = 4269804544, .id2 = 2450671904, .id3 = 148, .r = 255, .g = 255, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 34013184, .id1 = 7406084, .id2 = 0, .id3 = 0, .r = 255, .g = 255, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 502792192, .id1 = 786456, .id2 = 0, .id3 = 0, .r = 67, .g = 67, .b = 67 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 1, .id2 = 0, .id3 = 0, .r = 204, .g = 204, .b = 204 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 8224, .id2 = 0, .id3 = 0, .r = 255, .g = 153, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB, .layer = 1, .id0 = 0, .id1 = 64, .id2 = 0, .id3 = 0, .r = 0, .g = 255, .b = 0 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 128, .id2 = 0, .id3 = 0, .r = 239, .g = 239, .b = 239 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 256, .id2 = 0, .id3 = 0, .r = 243, .g = 243, .b = 243 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 16384, .id2 = 0, .id3 = 0, .r = 0, .g = 0, .b = 255 },
+{ .flags = LED_FLAG_MATCH_LAYER | LED_FLAG_MATCH_ID | LED_FLAG_USE_RGB | LED_FLAG_USE_GLITTER, .layer = 1, .id0 = 0, .id1 = 131072, .id2 = 0, .id3 = 0, .r = 255, .g = 0, .b = 0 },
+{.end = 1 }
+};
+
 led_instruction_t led_instructions_default[] = {
     {.flags = LED_FLAG_MATCH_ID | LED_FLAG_USE_ROTATE_PATTERN,                         .id0 = 32767}, //esc-del top row pattern with no glitter
     {.flags = LED_FLAG_MATCH_ID | LED_FLAG_USE_ROTATE_PATTERN | LED_FLAG_USE_GLITTER,  .id0 = 4294934528, .id1 = 4294967295, .id2 = 4294967295, .id3 = 511}, //esc-del top row pattern with no glitter
@@ -356,19 +400,22 @@ led_instruction_t led_instructions_default[] = {
 void *led_instruction_list[] = {
     led_instructions_pcw,
     led_instructions_pgb,
+    led_instructions_gsheets,
     led_instructions_default
 };
 
 void *led_game_instruction_list[] = {
     led_game_instructions_pcw,
     led_game_instructions_pgb,
+    led_game_instructions_gsheets,
     led_instructions_default
 };
 
 const uint8_t led_instruction_count = sizeof(led_instruction_list) / sizeof(led_instruction_list[0]);
 
-uint8_t led_default_rotate_pattern[3] = {  //each instruction group in led_instruction_list can have a default rotate pattern to set on change
+uint8_t led_default_rotate_pattern[4] = {  //each instruction group in led_instruction_list can have a default rotate pattern to set on change
     0,
     1,
+    0,
     2
 };

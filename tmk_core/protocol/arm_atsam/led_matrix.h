@@ -95,6 +95,20 @@ void rgb_matrix_init_user(void);
 #define LED_MODE_INDICATORS_ONLY    3
 #define LED_MODE_MAX_INDEX          LED_MODE_INDICATORS_ONLY   //Must be highest value
 
+#define LED_SCROLL_HORIZ            0
+#define LED_SCROLL_VERT             1
+#define LED_SCROLL_DIAG             2
+#define LED_SCROLL_DIAG2            3
+#define LED_SCROLL_DIAG3            4
+#define LED_SCROLL_CIRC             5
+#define LED_SCROLL_CENT             6
+#define LED_SCROLL_CENT2            7
+#define LED_SCROLL_SPLIT            8
+#define LED_SCROLL_SPLIT2           9
+#define LED_SCROLL_FUNK1            10
+#define LED_SCROLL_FUNK2            11
+#define LED_SCROLL_MAX_INDEX        12
+
 #define EF_NONE         0x00000000  //No effect
 #define EF_OVER         0x00000001  //Overwrite any previous color information with new
 #define EF_SCR_L        0x00000002  //Scroll left
@@ -160,7 +174,6 @@ extern uint8_t glitter_step;
 extern uint8_t glitter_smooth;
 extern const uint8_t led_setups_count;
 extern const uint8_t led_instruction_count;
-extern uint8_t led_animation_circular;
 extern uint8_t led_game_colors;
 extern uint8_t led_instruction_id;
 extern uint8_t led_animation_id;

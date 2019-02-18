@@ -440,19 +440,48 @@ void led_matrix_run(void)
         ro = 0;
         go = 0;
         bo = 0;
-
-        if (led_animation_circular) {
-            po = sqrtf((powf(fabsf((disp.width / 2) - (led_cur->x - disp.left)), 2) + powf(fabsf((disp.height / 2) - (led_cur->y - disp.bottom)), 2))) / disp.max_distance * 100;  //14x12 max_distance * 100 is 1843.9
-        }
-        else {
-            if (led_animation_orientation)
-            {
-                po = led_cur->px + led_cur->py;
-            }
-            else
-            {
+        float hundredpcent;
+        hundredpcent = 100.0;
+        switch(led_animation_orientation) {
+            case LED_SCROLL_HORIZ:
                 po = led_cur->px;
-            }
+                break;
+            case LED_SCROLL_VERT:
+                po = led_cur->py;
+                break;
+            case LED_SCROLL_DIAG:
+                po = led_cur->py + led_cur->px;
+                break;
+            case LED_SCROLL_DIAG2:
+                po = (led_cur->py / 4) + led_cur->px;  //cool diagnal
+                break;
+            case LED_SCROLL_DIAG3:
+                po = fabsf(((hundredpcent - led_cur->py) / 4) + led_cur->px);  //cool opposite diagnal
+                break;
+            case LED_SCROLL_CIRC:
+                po = sqrtf((powf(fabsf((disp.width / 2) - (led_cur->x - disp.left)), 2) + powf(fabsf((disp.height / 2) - (led_cur->y - disp.bottom)), 2))) / disp.max_distance * 100;
+                break;
+            case LED_SCROLL_CENT:
+                po = (disp.right - led_cur->x >= 7.594) ? ((led_cur->py / 6) + ((disp.right - (led_cur->x - disp.left)) * 3)): (led_cur->py / 6) + (led_cur->x * 3);  //7.594 is middle of spacebar led
+                break;
+            case LED_SCROLL_CENT2:
+                po = (led_cur->px >= 50) ? fabsf(((led_cur->py) / 4) + (hundredpcent - led_cur->px))  : (led_cur->py / 4) + led_cur->px;   //this one does have of keyboard
+                break;
+            case LED_SCROLL_SPLIT:
+                led_animation_direction = 1;
+                po = (disp.right - led_cur->x >= 7.294) ? fabsf(((hundredpcent - led_cur->py) / 4) + (hundredpcent - led_cur->px )) : fabsf((led_cur->py / 4) + (led_cur->px));   //split diagnal shifted left
+                break;
+            case LED_SCROLL_SPLIT2:
+                po = (disp.right - led_cur->x >= 7.594) ? fabsf( ((hundredpcent - led_cur->py) / 4) + led_cur->px) : fabsf((led_cur->py / 4) + (hundredpcent - led_cur->px)) ;   //cool no glitching either direction
+                break;
+            case LED_SCROLL_FUNK1:
+                po = (disp.right - led_cur->x >= 7.594) ? fabsf( ((hundredpcent - led_cur->py) / 4) + led_cur->px) : fabsf( (led_cur->py / 4) + led_cur->px) ;   //roll over diag in middle
+                break;
+            case LED_SCROLL_FUNK2:
+                po = (disp.right - led_cur->x >= 7.594) ? fabsf( ((hundredpcent - led_cur->py) / 4) + (hundredpcent - led_cur->px )) : fabsf((led_cur->py / 4) + (hundredpcent - led_cur->px)) ;
+                break;
+            default:
+                po = led_cur->px;
         }
 
         if (led_lighting_mode == LED_MODE_KEYS_ONLY && led_cur->scan == 255)
@@ -593,8 +622,7 @@ uint8_t led_matrix_init(void)
     led_lighting_mode = LED_MODE_NORMAL;
     led_animation_speed = 3.0f;
     led_animation_direction = 0;
-    led_animation_circular = 0;
-    led_animation_orientation = 0;
+    led_animation_orientation = 9;
     led_animation_breathing = 0;
     led_animation_glittering = 1;
     breathe_step = 1;

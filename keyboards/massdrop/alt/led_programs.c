@@ -101,7 +101,7 @@ led_setup_t leds_rainbow_s[] = {
     { .end = 1 },
 };
 
-//Rainbow scrolling
+//pink and cyan scrolling
 led_setup_t leds_pleasuretek_s[] = {
     { .hs = 0,      .he = 8.33,  .rs = 255, .re = 255, .gs = 255,   .ge = 255, .bs = 255,   .be = 255,   .ef = EF_OVER | EF_SCR_R },
     { .hs = 8.33,   .he = 16.6,  .rs = 255, .re = 255,   .gs = 255,   .ge = 20,   .bs = 255,   .be = 147,   .ef = EF_OVER | EF_SCR_R },
@@ -118,6 +118,7 @@ led_setup_t leds_pleasuretek_s[] = {
     { .end = 1 },
 };
 
+//white with black stripe scrolling
 led_setup_t leds_blackandwhite[] = {
     { .hs = 0,      .he = 16.67,  .rs = 0, .re = 0, .gs = 0,   .ge = 0, .bs = 0,   .be = 0,   .ef = EF_OVER | EF_SCR_R },
     { .hs = 16.67,  .he = 33.33,  .rs = 0, .re = 255,   .gs = 0, .ge = 255, .bs = 0,   .be = 255,   .ef = EF_OVER | EF_SCR_R },
@@ -128,20 +129,58 @@ led_setup_t leds_blackandwhite[] = {
     { .end = 1 },
 };
 
+//Teal <-> Salmon scroll
+led_setup_t leds_teal_salmon_s[] = {
+    { .hs = 0,  .he = 25,  .rs = 24,  .re = 24,  .gs = 215, .ge = 215, .bs = 204, .be = 204, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 25, .he = 50,  .rs = 24,  .re = 255, .gs = 215, .ge = 114, .bs = 204, .be = 118, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 50, .he = 75,  .rs = 255, .re = 255, .gs = 114, .ge = 114, .bs = 118, .be = 118, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 75, .he = 100, .rs = 255,  .re = 24, .gs = 114, .ge = 215, .bs = 118, .be = 204, .ef = EF_NONE | EF_SCR_R },
+    { .end = 1 },
+};
+
+//Teal <-> Salmon scroll
+led_setup_t leds_cyan_pinkaf_s[] = {
+    { .hs = 0,  .he = 25,  .rs = 0,  .re = 0,  .gs = 255, .ge = 255, .bs = 255, .be = 255, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 25, .he = 50,  .rs = 0,  .re = 255, .gs = 255, .ge = 20, .bs = 255, .be = 147, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 50, .he = 75,  .rs = 255, .re = 255, .gs = 20, .ge = 20, .bs = 147, .be = 147, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 75, .he = 100, .rs = 255,  .re = 0, .gs = 20, .ge = 255, .bs = 147, .be = 255, .ef = EF_NONE | EF_SCR_R },
+    { .end = 1 },
+};
+
+led_setup_t leds_cyan_pinkaf_si[] = {
+    { .hs = 0, .he = 25,  .rs = 255, .re = 255, .gs = 20, .ge = 20, .bs = 147, .be = 147, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 25, .he = 50, .rs = 255,  .re = 0, .gs = 20, .ge = 255, .bs = 147, .be = 255, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 50,  .he = 75,  .rs = 0,  .re = 0,  .gs = 255, .ge = 255, .bs = 255, .be = 255, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 75, .he = 100,  .rs = 0,  .re = 255, .gs = 255, .ge = 20, .bs = 255, .be = 147, .ef = EF_NONE | EF_SCR_R },
+    { .end = 1 },
+};
+
+led_setup_t leds_funkbutt[] = {   //I was raised in the hood
+    { .hs = 0,  .he = 25,  .rs = 0,  .re = 0,  .gs = 255, .ge = 255, .bs = 0, .be = 0, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 25, .he = 50,  .rs = 0,  .re = 255, .gs = 255, .ge = 0, .bs = 0, .be = 255, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 50, .he = 75,  .rs = 255, .re = 255, .gs = 0, .ge = 0, .bs = 255, .be = 255, .ef = EF_NONE | EF_SCR_R },
+    { .hs = 75, .he = 100, .rs = 255,  .re = 0, .gs = 0, .ge = 255, .bs = 255, .be = 0, .ef = EF_NONE | EF_SCR_R },
+    { .end = 1 },
+};
+
 void *led_setups[] = {
-    leds_pleasuretek_s,
-    leds_blackandwhite,
-    leds_rainbow_s,
-    leds_rainbow_ns,
-    leds_teal_salmon,
-    leds_yellow,
-    leds_red,
-    leds_green,
-    leds_blue,
-    leds_white,
-    leds_white_with_red_stripe,
-    leds_black_with_red_stripe,
-    leds_off
+    leds_pleasuretek_s,    //0
+    leds_cyan_pinkaf_s,    //1
+    leds_cyan_pinkaf_si,   //2
+    leds_blackandwhite,    //3
+    leds_rainbow_s,        //4
+    leds_rainbow_ns,       //5
+    leds_teal_salmon_s,    //6
+    leds_teal_salmon,      //7
+    leds_yellow,           //8
+    leds_red,              //9
+    leds_green,            //10
+    leds_blue,                   //11
+    leds_white,                  //12
+    leds_white_with_red_stripe,  //13
+    leds_black_with_red_stripe,  //14
+    leds_off,                    //15
+    leds_funkbutt                //16
 };
 
 const uint8_t led_setups_count = sizeof(led_setups) / sizeof(led_setups[0]);

@@ -450,12 +450,15 @@ void led_matrix_run(void)
                 po = led_cur->py;
                 break;
             case LED_SCROLL_DIAG:
+                led_animation_direction = 0;
                 po = led_cur->py + led_cur->px;
                 break;
             case LED_SCROLL_DIAG2:
+                led_animation_direction = 0;
                 po = (led_cur->py / 4) + led_cur->px;  //cool diagnal
                 break;
             case LED_SCROLL_DIAG3:
+                led_animation_direction = 0;
                 po = fabsf(((hundredpcent - led_cur->py) / 4) + led_cur->px);  //cool opposite diagnal
                 break;
             case LED_SCROLL_CIRC:
@@ -468,16 +471,18 @@ void led_matrix_run(void)
                 po = (led_cur->px >= 50) ? fabsf(((led_cur->py) / 4) + (hundredpcent - led_cur->px))  : (led_cur->py / 4) + led_cur->px;   //this one does have of keyboard
                 break;
             case LED_SCROLL_SPLIT:
-                led_animation_direction = 1;
+                led_animation_direction = 0;
                 po = (disp.right - led_cur->x >= 7.294) ? fabsf(((hundredpcent - led_cur->py) / 4) + (hundredpcent - led_cur->px )) : fabsf((led_cur->py / 4) + (led_cur->px));   //split diagnal shifted left
                 break;
             case LED_SCROLL_SPLIT2:
                 po = (disp.right - led_cur->x >= 7.594) ? fabsf( ((hundredpcent - led_cur->py) / 4) + led_cur->px) : fabsf((led_cur->py / 4) + (hundredpcent - led_cur->px)) ;   //cool no glitching either direction
                 break;
             case LED_SCROLL_FUNK1:
+                led_animation_direction = 0;
                 po = (disp.right - led_cur->x >= 7.594) ? fabsf( ((hundredpcent - led_cur->py) / 4) + led_cur->px) : fabsf( (led_cur->py / 4) + led_cur->px) ;   //roll over diag in middle
                 break;
             case LED_SCROLL_FUNK2:
+                led_animation_direction = 0;
                 po = (disp.right - led_cur->x >= 7.594) ? fabsf( ((hundredpcent - led_cur->py) / 4) + (hundredpcent - led_cur->px )) : fabsf((led_cur->py / 4) + (hundredpcent - led_cur->px)) ;
                 break;
             default:
@@ -622,20 +627,21 @@ uint8_t led_matrix_init(void)
     led_lighting_mode = LED_MODE_NORMAL;
     led_animation_speed = 3.0f;
     led_animation_direction = 0;
-    led_animation_orientation = 9;
-    led_animation_breathing = 0;
-    led_animation_glittering = 1;
+    led_animation_orientation = LED_SCROLL_CENT2;  //setup default animation orientation (defined in header file)
+    led_animation_breathing = 0;                  //turn breathing off by default
+    led_animation_glittering = 1;                 //turn glitter on by default
     breathe_step = 1;
     breathe_dir = 1;
     glitter_smooth = 1;    //glitter vibes = 0 and cloud vibes = 1
     led_animation_breathe_cur = BREATHE_MIN_STEP;
     glitter_step = 2;
-    led_game_colors = 0;
-    led_instruction_id = 0;
-    set_led_animation_id(0);
+    led_game_colors = 0;                        //set game mode leds off default
+    led_instruction_id = 0;                     //set default led instruction
+    set_led_animation_id(0);                    //set default animation setup/colorPattern
+
     //setup random glitter steps to start
     uint8_t i;
-    srand(667);
+    srand(710);
     for(i=0; i < ISSI3733_LED_COUNT; i++) {
       uint8_t rn = rand() % 255;
       led_animation_glitter_cur[i] = rn;
